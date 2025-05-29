@@ -14,10 +14,8 @@
 }
 
 @font-face {
-  font-family: 'AvenirLTStd-Black';
-  src: url('/fonts/AvenirLTStd-Black.woff2') format('woff2'),
-       url('/fonts/AvenirLTStd-Black.woff') format('woff'),
-       url('/fonts/AvenirLTStd-Black.ttf') format('truetype');
+  font-family: "AvenirLTStd-Black";
+  src: url("/fonts/AvenirLTStd-Black.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
