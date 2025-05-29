@@ -1,4 +1,4 @@
-import { Table, Pagination } from "antd";
+import { Table, Pagination, Skeleton } from "antd";
 
 const CallsTable = ({
   dataSource,
@@ -7,26 +7,46 @@ const CallsTable = ({
   limit,
   totalItems,
   handlePageChange,
+  loading,
 }) => {
+  const skeletonColumns = columns.map((col, idx) => ({
+    ...col,
+    render: () => (
+      <Skeleton.Input style={{ width: 120 }} key={idx} active size="small" />
+    ),
+  }));
+
+  const skeletonData = Array.from({ length: limit }).map((_, index) => ({
+    key: index,
+  }));
+
   return (
     <>
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        pagination={false} 
-        rowKey="id"
-      />
-      <div className="mt-4 w-full flex flex-col items-center">
-        <Pagination
-          current={currentPage}
-          pageSize={limit}
-          total={totalItems}
-          onChange={handlePageChange}
-          showSizeChanger={false}
+    {/* Overflow Table to make it mobile friendly */}
+      <div className="w-full overflow-x-auto bg-white">
+        <Table
+          dataSource={loading ? skeletonData : dataSource}
+          columns={loading ? skeletonColumns : columns}
+          pagination={false}
+          rowKey="id"
         />
-        <br />
-        <p className="-mt-2 text-sm">{(currentPage-1) * 10 +1} - {currentPage*10} of {totalItems}</p>
       </div>
+      {!loading && (
+        <div className="mt-4 w-full flex flex-col items-center">
+          <Pagination
+            current={currentPage}
+            pageSize={limit}
+            total={totalItems}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+          <br />
+          <p className="-mt-2 text-sm">
+            {(currentPage - 1) * limit + 1} -{" "}
+            {Math.min(currentPage * limit, totalItems)} of {totalItems}
+          </p>
+        </div>
+      )}
     </>
   );
 };

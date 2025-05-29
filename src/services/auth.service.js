@@ -2,8 +2,10 @@ import { persist } from "zustand/middleware";
 import { create } from "zustand";
 import createAxiosInstance from "@/app/axios/axiosInstance";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 const axiosInstance = createAxiosInstance();
+const token = Cookies.get("access_token");
 
 const useAuthStore = create(
   persist(
@@ -12,7 +14,7 @@ const useAuthStore = create(
       token: null,
       loading: false,
       error: null,
-
+      // ----------------------------------------------- Login User Endpoint -------------------------------------------
       login: async (payload) => {
         set({ loading: true, error: null });
         try {
@@ -26,28 +28,26 @@ const useAuthStore = create(
         }
       },
 
+      // ----------------------------------------------- Logout User Endpoint -------------------------------------------
       logoutUser: () => {
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         set({ token: null });
       },
 
+      // ----------------------------------------------- Refresh Token Endpoint -------------------------------------------
       generateNewToken: async () => {
         try {
-          const refreshToken = Cookies.get("refresh_token");
-          if (!refreshToken) throw new Error("No refresh token available");
+          if (!token) throw new Error("No token available");
 
-          const res = await refreshInstance.post("/auth/refresh-token", {
-            refreshToken,
-          });
-
-          const newAccessToken = res.data?.access_token;
+          const refreshInstance = createAxiosInstance(token);
+          const res = await refreshInstance.post("/auth/refresh-token");
+          
+          const newAccessToken = res?.data?.access_token;
           if (!newAccessToken) throw new Error("No token received");
 
           Cookies.set("access_token", newAccessToken);
           set({ token: newAccessToken, error: null });
-
-          console.log("New token:", newAccessToken);
 
           return newAccessToken;
         } catch (error) {

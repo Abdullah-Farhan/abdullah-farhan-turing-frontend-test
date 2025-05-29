@@ -1,3 +1,5 @@
+// formatting time to X minutes Y seconds 
+
 export function formatDuration(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;

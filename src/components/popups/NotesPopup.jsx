@@ -2,15 +2,13 @@ const NotesPopup = ({ callData, notes, onNotesChange, onClose, onSave }) => {
   return (
     <div className="w-full h-screen bg-black/30 fixed inset-0 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg w-full max-w-lg relative shadow-lg">
-        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+          className="absolute top-4 right-4 text-primary hover:text-primary/70 text-2xl"
         >
           &times;
         </button>
 
-        {/* Content with padding */}
         <div className="px-6 pt-4">
           {/* Header */}
           <div className="mb-4">
@@ -23,9 +21,7 @@ const NotesPopup = ({ callData, notes, onNotesChange, onClose, onSave }) => {
 
         <div className="w-full h-[1px] bg-black/30"></div>
 
-        {/* Content with padding */}
         <div className="p-6 space-y-4 w-2/3 text-sm">
-          {/* Details in two-column grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             <div className="text-sm font-medium">Call Type</div>
             <div className="text-primary">

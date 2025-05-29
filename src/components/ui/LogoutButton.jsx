@@ -24,7 +24,7 @@ const LogoutButton = () => {
     return (
       <div>
         <button
-          className="px-4 md:px-10 py-2 bg-primary text-xs md:text-base text-white"
+          className="px-4 cursor-pointer md:px-10 py-2 bg-primary text-xs md:text-base text-white"
           onClick={logout}
         >
           Log Out

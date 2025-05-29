@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import createAxiosInstance from "@/app/axios/axiosInstance";
 import Cookies from "js-cookie";
-import generateNewToken from "./auth.service";
 
 let token = Cookies.get("access_token");
 let axiosInstance = createAxiosInstance(token);
@@ -16,6 +15,7 @@ const useCallStore = create(
       loading: false,
       error: null,
 
+      // ----------------------------------------------- Fetch all calls data Endpoint -------------------------------------------
       getCallsData: async (offset, limit) => {
         set({ loading: true });
         try {
@@ -23,48 +23,19 @@ const useCallStore = create(
             const res = await axiosInstance.get(
               `/calls?offset=${offset}&limit=${limit}`
             );
+
+            // fetching calls data and setting them into states
             set({
               callsData: res?.data?.nodes,
               totalPages: Math.ceil(res?.data?.totalCount / limit),
               totalCount: res?.data?.totalCount,
               loading: false,
             });
-            console.log(res);
             return res;
           }
         } catch (error) {
           console.log(error);
 
-          if (
-            error.response?.status === 401 ||
-            error.response?.statusCode === 401
-          ) {
-            try {
-              const newToken = await get().generateNewToken();
-              if (newToken) {
-                token = newToken;
-                axiosInstance = createAxiosInstance(token);
-                Cookies.set("access_token", newToken);
-
-                const retryRes = await axiosInstance.get(
-                  `/calls?offset=${offset}&limit=${limit}`
-                );
-                set({
-                  callsData: retryRes?.data?.nodes,
-                  totalPages: Math.ceil(retryRes?.data?.totalCount / limit),
-                  totalCount: retryRes?.data?.totalCount,
-                  loading: false,
-                });
-                return retryRes;
-              }
-            } catch (retryError) {
-              set({
-                error: retryError.message || "Retry after token refresh failed",
-                loading: false,
-              });
-              throw retryError;
-            }
-          }
           set({
             error: error.response?.data?.message || error.message,
             loading: false,
@@ -72,6 +43,37 @@ const useCallStore = create(
           throw error;
         }
       },
+      
+// ----------------------------------------------- Update Status (is_archived) Endpoint -------------------------------------------
+      updateStatus: async (id) => {
+        try {
+          const res = await axiosInstance.put(`/calls/${id}/archive`);
+          if (res.status === 200) {
+            const updatedCall = res.data;
+
+            // from Calls Data only updating the call for which status was updated to reduce redundant requests to server
+            set((state) => ({
+              callsData: state.callsData.map((call) =>
+                call.id === updatedCall.id ? updatedCall : call
+              ),
+            }));
+          }
+          return res;
+        } catch (error) {
+          set({
+            error: error.response?.data?.message || error.message,
+          });
+          throw error;
+        }
+      },
+
+      // ----------------------------------------------- Add Note to a Call Endpoint -------------------------------------------
+      addNote: async (id, content) => {
+        const res = await axiosInstance.post(`/calls/${id}/note`, {
+          content
+        })
+        return res;
+      }
     }),
     {
       name: "call-storage",

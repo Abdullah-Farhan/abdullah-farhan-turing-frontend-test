@@ -1,6 +1,12 @@
+import { formatDate } from "./dateFormatter";
 import { formatDuration } from "./timeFormatter";
+import { Popover } from "antd";
 
-const getColumns = (setSelectedCallData, setIsNotesPopupOpen) => [
+const getColumns = (
+  setSelectedCallData,
+  setIsNotesPopupOpen,
+  updateStatus
+) => [
   {
     title: "Call Type",
     dataIndex: "call_type",
@@ -58,20 +64,37 @@ const getColumns = (setSelectedCallData, setIsNotesPopupOpen) => [
     title: "Created At",
     dataIndex: "created_at",
     key: "createdAt",
-    render: (value) => new Date(value).toLocaleString(),
+    render: (value) => formatDate(value),
   },
   {
     title: "Status",
     dataIndex: "is_archived",
     key: "status",
-    render: (status) => (
-      <div
-        className={`px-2 py-1 flex justify-center items-center ${
-          status ? "text-green-700 bg-green-100" : "text-gray-700 bg-gray-100"
-        }`}
+    render: (status, record) => (
+      <Popover
+        content={
+          <div>
+            <p>Change status to {status ? "Unarchive" : "Archived"}?</p>
+            <button
+              className="text-primary hover:underline"
+              onClick={async () => {
+                await updateStatus(record.id);
+              }}
+            >
+              Confirm
+            </button>
+          </div>
+        }
+        trigger="click"
       >
-        {status ? "Archived" : "Unarchive"}
-      </div>
+        <div
+          className={`px-2 py-1 flex justify-center items-center cursor-pointer ${
+            status ? "text-green-700 bg-green-100" : "text-gray-700 bg-gray-100"
+          }`}
+        >
+          {status ? "Archived" : "Unarchive"}
+        </div>
+      </Popover>
     ),
   },
   {
@@ -86,7 +109,7 @@ const getColumns = (setSelectedCallData, setIsNotesPopupOpen) => [
           });
           setIsNotesPopupOpen(true);
         }}
-        className="text-primary hover:underline"
+        className="bg-primary text-white px-3 py-1"
       >
         Add Note
       </button>
