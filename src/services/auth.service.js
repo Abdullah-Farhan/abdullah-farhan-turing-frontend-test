@@ -1,6 +1,6 @@
 import { persist } from "zustand/middleware";
 import { create } from "zustand";
-import createAxiosInstance from "@/app/axios/axiosInstance";
+import createAxiosInstance from "@/axios/axiosInstance";
 import Cookies from "js-cookie";
 import axios from "axios";
 
