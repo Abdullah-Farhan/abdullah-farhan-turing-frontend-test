@@ -28,7 +28,7 @@ const CallsTable = ({
           dataSource={loading ? skeletonData : dataSource}
           columns={loading ? skeletonColumns : columns}
           pagination={false}
-          rowKey="id"
+          rowKey={loading ? "key" : "id"}
         />
       </div>
       {!loading && (
